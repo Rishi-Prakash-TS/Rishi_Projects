@@ -4,6 +4,19 @@ Created on Sun Nov  4 09:06:12 2018
 
 @author: sivar
 """
+#ATTRIBUTES USED
+Item_Fat_Content 
+Item_Identifier               
+Item_MRP                      
+Item_Outlet_Sales             
+Item_Type                       
+Item_Visibility              
+Item_Weight                    
+Outlet_Establishment_Year        
+Outlet_Identifier               
+Outlet_Location_Type             
+Outlet_Size                      
+Outlet_Type 
 
 import pandas as pd
 import numpy as np
@@ -15,17 +28,47 @@ test= pd.read_csv('test_big.csv')
 train['source']='train'
 test['source']='test'
 data=pd.concat([train,test],ignore_index=True)
-print (train.shape, test.shape, data.shape)
+print (train.shape, test.shape, data.shape)      
+#OUTPUT (8523, 13) (5681, 12) (14204, 13)
 
 #missing values
 data.apply(lambda x: sum(x.isnull()))
+#OUTPUT
+Item_Fat_Content                0
+Item_Identifier                 0
+Item_MRP                        0
+Item_Outlet_Sales            5681
+Item_Type                       0
+Item_Visibility                 0
+Item_Weight                  2439
+Outlet_Establishment_Year       0
+Outlet_Identifier               0
+Outlet_Location_Type            0
+Outlet_Size                  4016
+Outlet_Type                     0
+source                          0
 
 #item outlet sales can have zero values as it means there was no sales
 
 data.describe()
 
+
 #unique values
 data.apply(lambda x: len(x.unique()))
+#OUTPUT
+Item_Fat_Content                 5
+Item_Identifier               1559
+Item_MRP                      8052
+Item_Outlet_Sales             3494
+Item_Type                       16
+Item_Visibility              13006
+Item_Weight                    416
+Outlet_Establishment_Year        9
+Outlet_Identifier               10
+Outlet_Location_Type             3
+Outlet_Size                      4
+Outlet_Type                      4
+source                           2
 
 #finding the frequency of different categories in each nominal data
 cat_col=[x for x in data.dtypes.index if data.dtypes[x]=='object']
@@ -35,6 +78,14 @@ cat_col=[x for x in cat_col if x not in ['Item_Identifier','Outlet_Identifier','
 for col in cat_col:
     print ('\nFrequency of category for varieble %s'%col)
     print (data[col].value_counts())
+#OUTPUT
+Frequency of category for varieble Item_Fat_Content
+Low Fat    8485
+Regular    4824
+LF          522
+reg         195
+low fat     178
+Name: Item_Fat_Content, dtype: int64
 #from Item_Fat_Content we can see the low fat is repeated twice as lf and Low Fat similarly other items
 
 #DATA CLEANING
@@ -58,6 +109,13 @@ sum(data['Item_Visibility']==0)
 
 # Consider combining Outlet_Type
 data.pivot_table(values='Item_Outlet_Sales',index='Outlet_Type')
+#OUTPUT
+                   Item_Outlet_Sales
+Outlet_Type                         
+Grocery Store             339.828500
+Supermarket Type1        2316.181148
+Supermarket Type2        1995.498739
+Supermarket Type3        3694.038558
 #there is significant difference between each store
 
 #creating a new feature which has Item_Visibility for each product(product id is given in Item_Identifier) thus in future using this column we can compare visibility given to each product in different stores
@@ -77,7 +135,13 @@ data['Item_Type_Combined'] = data['Item_Identifier'].apply(lambda x: x[0:2])
 data['Item_Type_Combined'] = data['Item_Type_Combined'].map({'FD':'Food',
                                                              'NC':'Non-Consumable',
                                                              'DR':'Drinks'})
-data['Item_Type_Combined'].value_counts() #from output food has the highest sales
+data['Item_Type_Combined'].value_counts() 
+#OUTPUT
+Food              10201
+Non-Consumable     2686
+Drinks             1317
+Name: Item_Type_Combined, dtype: int64
+#from output food has the highest sales
 
 #we can use the Item_Type_Combined column to find the average of sales of the 3 product types
 data.pivot_table(values='Item_Outlet_Sales', index='Item_Type_Combined') #thus food has the highest sales average
