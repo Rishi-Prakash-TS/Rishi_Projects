@@ -193,6 +193,28 @@ alg1 = LinearRegression(normalize=True)
 modelfit(alg1, train, test, predictors, target, IDcol, 'alg1.csv')
 coef1 = pd.Series(alg1.coef_, predictors).sort_values()
 coef1.plot(kind='bar', title='Model Coefficients')
+#as from the plot we can see although being better than the baselinr, it has higher values of coefficients whichmeans there is presence of overfitting
+
+# to prevent overfitting use ridge(which reduces coefficient values) and lasso(which completely equates coefficients to zero)
+#Ridge regression model
+predictors = [x for x in train.columns if x not in [target]+IDcol]
+alg2 = Ridge(alpha=0.05,normalize=True)
+modelfit(alg2, train, test, predictors, target, IDcol, 'alg2.csv')
+coef2 = pd.Series(alg2.coef_, predictors).sort_values()
+coef2.plot(kind='bar', title='Model Coefficients')
+
+
+#decision tree
+from sklearn.tree import DecisionTreeRegressor
+predictors = [x for x in train.columns if x not in [target]+IDcol]
+alg3 = DecisionTreeRegressor(max_depth=15, min_samples_leaf=100)
+modelfit(alg3, train, test, predictors, target, IDcol, 'alg3.csv')
+coef3 = pd.Series(alg3.feature_importances_, predictors).sort_values(ascending=False)
+coef3.plot(kind='bar', title='Feature Importances')
+
+
+
+
 
 
 
